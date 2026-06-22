@@ -1,0 +1,89 @@
+<h2>📱 界面布局设计 — 首页</h2>
+<p class="subtitle">手机端为主，PC端自适应。一个页面搞定所有操作。</p>
+
+<div class="section">
+  <h3>布局结构（从上到下）</h3>
+</div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">📱 手机端 (375px)</div>
+    <div class="mockup-body" style="max-width:375px;margin:0 auto;font-size:13px;">
+      <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;padding:16px;text-align:center;">
+          <div style="font-size:18px;font-weight:700;">🍜 今天吃什么</div>
+          <div style="font-size:11px;opacity:0.8;margin-top:2px;">选择困难症终结者</div>
+        </div>
+        <!-- 抽奖区 -->
+        <div style="padding:20px 16px;text-align:center;">
+          <div style="background:#fef3c7;border:2px dashed #f59e0b;border-radius:16px;padding:24px 12px;margin-bottom:12px;">
+            <div style="font-size:11px;color:#92400e;margin-bottom:8px;">🎰 点击下方按钮开始抽奖</div>
+            <div style="font-size:28px;font-weight:700;color:#d97706;min-height:40px;line-height:40px;">???</div>
+          </div>
+          <div class="mock-button" style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border:none;padding:14px 48px;font-size:16px;border-radius:50px;font-weight:700;width:100%;">🎲 开抽！</div>
+        </div>
+        <!-- 食物列表 -->
+        <div style="padding:8px 16px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-weight:700;font-size:14px;">📋 可吃清单 (6)</span>
+            <div class="mock-button" style="background:#10b981;color:#fff;border:none;padding:6px 12px;font-size:12px;border-radius:20px;">+ 添加</div>
+          </div>
+          <div style="border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+            <div style="padding:10px 12px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span>🍜 兰州拉面</span><span style="color:#9ca3af;font-size:11px;">✏️ 🗑️</span></div>
+            <div style="padding:10px 12px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span>🍛 黄焖鸡米饭</span><span style="color:#9ca3af;font-size:11px;">✏️ 🗑️</span></div>
+            <div style="padding:10px 12px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span>🥟 沙县小吃</span><span style="color:#9ca3af;font-size:11px;">✏️ 🗑️</span></div>
+            <div style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span>🍔 麦当劳</span><span style="color:#9ca3af;font-size:11px;">✏️ 🗑️</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">🖥️ PC端 (≥768px)</div>
+    <div class="mockup-body" style="font-size:13px;">
+      <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.1);">
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;padding:20px 32px;text-align:center;">
+          <div style="font-size:24px;font-weight:700;">🍜 今天吃什么</div>
+          <div style="font-size:13px;opacity:0.8;">选择困难症终结者</div>
+        </div>
+        <!-- PC 双栏布局 -->
+        <div style="display:flex;gap:0;">
+          <!-- 左：抽奖区 -->
+          <div style="flex:1;padding:32px;text-align:center;border-right:1px solid #f3f4f6;">
+            <div style="background:#fef3c7;border:2px dashed #f59e0b;border-radius:16px;padding:36px 16px;margin-bottom:16px;">
+              <div style="font-size:13px;color:#92400e;margin-bottom:12px;">🎰 点击下方按钮开始抽奖</div>
+              <div style="font-size:36px;font-weight:700;color:#d97706;min-height:52px;line-height:52px;">???</div>
+            </div>
+            <div class="mock-button" style="background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border:none;padding:16px 64px;font-size:18px;border-radius:50px;font-weight:700;">🎲 开抽！</div>
+          </div>
+          <!-- 右：食物列表 -->
+          <div style="flex:1;padding:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span style="font-weight:700;font-size:15px;">📋 可吃清单 (6)</span>
+              <div class="mock-button" style="background:#10b981;color:#fff;border:none;padding:6px 16px;font-size:12px;border-radius:20px;">+ 添加</div>
+            </div>
+            <div style="border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+              <div style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span style="font-size:14px;">🍜 兰州拉面</span><span style="color:#9ca3af;font-size:12px;">✏️ 🗑️</span></div>
+              <div style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span style="font-size:14px;">🍛 黄焖鸡米饭</span><span style="color:#9ca3af;font-size:12px;">✏️ 🗑️</span></div>
+              <div style="padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span style="font-size:14px;">🥟 沙县小吃</span><span style="color:#9ca3af;font-size:12px;">✏️ 🗑️</span></div>
+              <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:#fff;"><span style="font-size:14px;">🍔 麦当劳</span><span style="color:#9ca3af;font-size:12px;">✏️ 🗑️</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <h3>🎯 设计要点</h3>
+  <ul>
+    <li><strong>一页式</strong> — 所有功能在一个页面，无需跳转</li>
+    <li><strong>手机上</strong> — 抽奖区在上，列表在下，单手可操作</li>
+    <li><strong>PC上</strong> — 左右双栏，抽奖和列表并排</li>
+    <li><strong>暖色调</strong> — 橙红配色，激发食欲 🍜</li>
+    <li><strong>添加/编辑</strong> — 弹窗形式，不离开当前页面</li>
+  </ul>
+</div>

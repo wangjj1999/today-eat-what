@@ -1,0 +1,54 @@
+<h2>🎰 抽奖动画流程</h2>
+<p class="subtitle">点"开抽"后的完整动画时序</p>
+
+<div class="section">
+  <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+    <!-- 阶段 1 -->
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #f3f4f6;">
+      <div style="background:#f97316;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+      <div>
+        <h3 style="margin:0 0 4px 0;">快速滚动 (1.5 秒)</h3>
+        <p style="margin:0;color:#6b7280;">食物名字在抽奖框中以约 80ms/个 的速度快速切换，像老虎机转轮。名字随机出现，制造悬念。</p>
+        <div style="background:#fef3c7;border-radius:8px;padding:12px;margin-top:8px;text-align:center;font-size:22px;font-weight:700;color:#d97706;">
+          兰州拉面 → 黄焖鸡 → 沙县 → 麦当劳 → ...
+        </div>
+      </div>
+    </div>
+
+    <!-- 阶段 2 -->
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #f3f4f6;">
+      <div style="background:#f97316;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+      <div>
+        <h3 style="margin:0 0 4px 0;">逐渐减速 (1 秒)</h3>
+        <p style="margin:0;color:#6b7280;">切换速度从 80ms 逐渐降到 300ms，名字变换越来越慢，紧张感拉满。</p>
+        <div style="background:#fef3c7;border-radius:8px;padding:12px;margin-top:8px;text-align:center;font-size:22px;font-weight:700;color:#d97706;">
+          ... 沙县 ... 兰州 ... 黄焖鸡 ...
+        </div>
+      </div>
+    </div>
+
+    <!-- 阶段 3 -->
+    <div style="display:flex;align-items:flex-start;gap:16px;">
+      <div style="background:#10b981;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+      <div>
+        <h3 style="margin:0 0 4px 0;">🎉 定格结果 + 庆祝效果 (持续展示)</h3>
+        <p style="margin:0;color:#6b7280;">最终名字放大显示，配合轻微弹跳动画 + emoji 撒花（🍜✨🎉），持续展示直到用户下次操作。</p>
+        <div style="background:#fef3c7;border-radius:8px;padding:16px;margin-top:8px;text-align:center;font-size:32px;font-weight:700;color:#d97706;animation:pulse 0.3s ease;">
+          🎉 黄焖鸡米饭 🎉
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <h3>🎯 动画技术方案</h3>
+  <ul>
+    <li><strong>纯 CSS + JS setTimeout</strong> — 名字切换用 <code>setInterval</code> 控制，减速用递增延迟</li>
+    <li><strong>结果弹跳</strong> — CSS <code>@keyframes bounce</code>，简单一个动画类</li>
+    <li><strong>Emoji 撒花</strong> — 用 JS 在结果周围随机生成几个 emoji 元素，CSS 动画飘散</li>
+    <li><strong>无外部依赖</strong> — 全部手写，几十行代码搞定</li>
+  </ul>
+</div>

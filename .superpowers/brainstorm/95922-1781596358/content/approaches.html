@@ -1,0 +1,39 @@
+## 🍔 三种技术方案对比
+
+<p class="subtitle">同一个需求，三种实现路径 — 点击你倾向的方案</p>
+
+<div class="options">
+  <div class="option" data-choice="vanilla" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>纯 HTML/CSS/JS 单文件</h3>
+      <p>一个 .html 文件搞定一切，双击打开就能用。零依赖、零安装、零构建。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>无需安装任何工具</li><li>双击浏览器就能打开</li><li>极其轻量（几十KB）</li><li>可以存手机桌面当 App 用</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>代码都在一个文件里</li><li>后续加复杂功能会稍乱</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="alpine" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Alpine.js 单文件</h3>
+      <p>同样是单文件，但引入 Alpine.js CDN 获得响应式数据绑定，代码组织更清晰。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>无需构建工具</li><li>响应式数据，代码更干净</li><li>扩展性好</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>依赖 CDN（离线不可用）</li><li>引入约 50KB 外部库</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="react" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>React + Vite SPA</h3>
+      <p>现代化前端工程方案，组件化开发，为未来扩展留足空间。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>组件化，扩展性最强</li><li>丰富的动画库可选</li><li>后续加后端很方便</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>需要 Node.js 环境</li><li>构建后才能部署</li><li>对这么简单的需求来说偏重</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
