@@ -28,6 +28,51 @@ body {
 .header-title { font-size: 22px; font-weight: 800; }
 .header-subtitle { font-size: 12px; opacity: 0.8; margin-top: 2px; }
 
+/* ===== Settings Button ===== */
+.header-actions { position: absolute; top: 12px; right: 16px; }
+.btn-settings {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-settings:hover { background: rgba(255,255,255,0.35); }
+
+/* ===== Sync Status ===== */
+.sync-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.sync-dot.on { background: #10b981; }
+.sync-dot.off { background: #9ca3af; }
+.sync-dot.loading { background: #f59e0b; animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.sync-info { font-size: 12px; color: #6b7280; text-align: center; margin-top: 4px; }
+
+/* ===== Settings Modal ===== */
+.settings-section { margin-bottom: 4px; }
+.settings-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; }
+.settings-hint { font-size: 12px; color: #9ca3af; margin-top: 4px; line-height: 1.5; }
+.settings-hint a { color: #8b5cf6; }
+.btn-small {
+  background: #f3f4f6; color: #4b5563;
+  border: none; padding: 6px 14px;
+  border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer;
+}
+.btn-small:hover { background: #e5e7eb; }
+.btn-small.danger { background: #fef2f2; color: #ef4444; }
+.btn-small.danger:hover { background: #fecaca; }
+
 /* ===== Main Container ===== */
 .main {
   flex: 1;
@@ -369,6 +414,9 @@ body {
   <header class="header">
     <h1 class="header-title">🍜 今天吃什么</h1>
     <p class="header-subtitle">选择困难症终结者</p>
+    <div class="header-actions">
+      <button class="btn-settings" id="btnSettings" title="设置">⚙️</button>
+    </div>
   </header>
 
   <main class="main">
@@ -452,6 +500,33 @@ body {
     </div>
   </div>
 
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal" id="settingsModal">
+      <h3 class="modal-title" id="settingsTitle">⚙️ 同步设置</h3>
+      <div class="settings-section">
+        <span id="syncStatus">
+          <span class="sync-dot off"></span>未启用同步
+        </span>
+      </div>
+      <div class="settings-section">
+        <label class="settings-label" for="settingsToken">GitHub Token</label>
+        <input type="password" class="modal-input" id="settingsToken"
+               placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" maxlength="100" autocomplete="off"/>
+        <p class="settings-hint">
+          需要创建一个 Fine-grained token，仅授权此仓库的 Contents 读写。
+          <a href="https://github.com/settings/tokens?type=beta" target="_blank">创建 Token →</a>
+        </p>
+      </div>
+      <p class="modal-error" id="settingsError"></p>
+      <div class="modal-actions">
+        <button class="btn-small danger" id="btnClearToken" style="display:none">清除 Token</button>
+        <button class="btn-cancel" id="btnSettingsCancel">关闭</button>
+        <button class="btn-confirm" id="btnSettingsSave">保存并启用</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -460,7 +535,73 @@ body {
     const STORAGE_KEY_DAILY = 'food-list-daily';
     const STORAGE_KEY_PREMIUM = 'food-list-premium';
     const LEGACY_KEY = 'food-list';
+    const TOKEN_KEY = 'gh-sync-token';
+    const REPO_OWNER = 'wangjj1999';
+    const REPO_NAME = 'today-eat-what';
+    const DATA_PATH = 'data.json';
+    const REPO_API = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATA_PATH}`;
 
+    // Token management
+    function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
+    function setToken(t) { if (t) localStorage.setItem(TOKEN_KEY, t); }
+    function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+    // Remote sync state
+    let remoteSha = null;
+    let syncEnabled = false;
+
+    async function fetchRemoteData() {
+      const token = getToken();
+      if (!token) return null;
+      try {
+        const resp = await fetch(REPO_API, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
+          cache: 'no-store'
+        });
+        if (!resp.ok) {
+          if (resp.status === 404) return null; // data.json doesn't exist yet
+          throw new Error(`GitHub API: ${resp.status}`);
+        }
+        const data = await resp.json();
+        remoteSha = data.sha;
+        const decoded = JSON.parse(atob(data.content));
+        if (decoded && Array.isArray(decoded.daily) && Array.isArray(decoded.premium)) {
+          return { daily: decoded.daily, premium: decoded.premium };
+        }
+      } catch (e) { console.warn('fetchRemoteData failed:', e.message); }
+      return null;
+    }
+
+    async function pushRemoteData() {
+      const token = getToken();
+      if (!token || !syncEnabled) return;
+      try {
+        const json = JSON.stringify(foods);
+        // Use TextEncoder for proper UTF-8 base64 encoding
+        const bytes = new TextEncoder().encode(json);
+        const base64 = btoa(String.fromCharCode(...bytes));
+        const body = { message: 'update food lists', content: base64 };
+        if (remoteSha) body.sha = remoteSha;
+
+        const resp = await fetch(REPO_API, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' },
+          body: JSON.stringify(body)
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          remoteSha = data.content.sha;
+          return true;
+        } else if (resp.status === 422) {
+          // SHA conflict — data changed remotely, will be picked up on next load
+          console.warn('pushRemoteData: SHA conflict, remote changed');
+          remoteSha = null;
+        }
+      } catch (e) { console.warn('pushRemoteData failed:', e.message); }
+      return false;
+    }
+
+    // Local fallback
     function loadFoods(key, defaults) {
       try {
         const raw = localStorage.getItem(key);
@@ -472,9 +613,9 @@ body {
       return [...defaults];
     }
 
-    function saveFoods(key, foods) {
+    function saveFoods(key, foodsArr) {
       try {
-        localStorage.setItem(key, JSON.stringify(foods));
+        localStorage.setItem(key, JSON.stringify(foodsArr));
       } catch (e) {
         showToast('存储空间不足，请清理一些数据');
       }
@@ -487,7 +628,6 @@ body {
         if (legacy) {
           const parsed = JSON.parse(legacy);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            // Only migrate if daily key doesn't exist yet
             if (!localStorage.getItem(STORAGE_KEY_DAILY)) {
               localStorage.setItem(STORAGE_KEY_DAILY, JSON.stringify(parsed));
             }
@@ -509,7 +649,37 @@ body {
     function persistMenu(menuKey) {
       const key = menuKey === 'daily' ? STORAGE_KEY_DAILY : STORAGE_KEY_PREMIUM;
       saveFoods(key, foods[menuKey]);
+      // Async push to GitHub (fire and forget)
+      pushRemoteData();
     }
+
+    // ===== Sync on Load =====
+    (async function initSync() {
+      const token = getToken();
+      if (!token) return;
+
+      syncEnabled = true;
+      updateSyncUI('loading');
+
+      const remoteData = await fetchRemoteData();
+      if (remoteData) {
+        // Remote data wins — update in-memory and localStorage
+        foods.daily = remoteData.daily;
+        foods.premium = remoteData.premium;
+        saveFoods(STORAGE_KEY_DAILY, foods.daily);
+        saveFoods(STORAGE_KEY_PREMIUM, foods.premium);
+        updateSyncUI('on');
+      } else if (remoteSha === null && remoteData === null) {
+        // Remote fetch failed (network or 404) — keep local, but sync is still on
+        updateSyncUI('on');
+      } else {
+        updateSyncUI('off');
+      }
+
+      // Re-render both menus with synced data
+      renderList('daily');
+      renderList('premium');
+    })();
     // ===== DOM References =====
     // Daily
     const lotteryBoxDaily    = document.getElementById('lotteryBoxDaily');
@@ -864,12 +1034,126 @@ body {
     document.addEventListener('keydown', (e) => {
       if (modalOverlay.classList.contains('active')) return;
       if (deleteOverlay.classList.contains('active')) return;
+      if (settingsOverlay.classList.contains('active')) return;
 
       // Space or Enter triggers daily lottery (primary)
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         handleLotteryClick('daily');
       }
+    });
+
+    // ===== Settings =====
+    const settingsOverlay    = document.getElementById('settingsOverlay');
+    const settingsTokenInput = document.getElementById('settingsToken');
+    const settingsError      = document.getElementById('settingsError');
+    const btnSettings        = document.getElementById('btnSettings');
+    const btnSettingsCancel  = document.getElementById('btnSettingsCancel');
+    const btnSettingsSave    = document.getElementById('btnSettingsSave');
+    const btnClearToken      = document.getElementById('btnClearToken');
+    const syncStatusEl       = document.getElementById('syncStatus');
+
+    function updateSyncUI(state) {
+      if (state === 'on') {
+        syncStatusEl.innerHTML = '<span class="sync-dot on"></span>已启用同步';
+      } else if (state === 'loading') {
+        syncStatusEl.innerHTML = '<span class="sync-dot loading"></span>同步中...';
+      } else {
+        syncStatusEl.innerHTML = '<span class="sync-dot off"></span>未启用同步';
+      }
+    }
+
+    function openSettings() {
+      const token = getToken();
+      settingsTokenInput.value = token;
+      btnClearToken.style.display = token ? '' : 'none';
+      settingsError.textContent = '';
+      updateSyncUI(syncEnabled ? 'on' : 'off');
+      settingsOverlay.classList.add('active');
+    }
+
+    function closeSettings() {
+      settingsOverlay.classList.remove('active');
+    }
+
+    async function saveSettings() {
+      const token = settingsTokenInput.value.trim();
+      if (!token) {
+        settingsError.textContent = '请输入 GitHub Token';
+        return;
+      }
+
+      // Validate token by making a test request
+      settingsError.textContent = '';
+      updateSyncUI('loading');
+      setToken(token);
+      syncEnabled = true;
+
+      const remoteData = await fetchRemoteData();
+      if (remoteData === null && remoteSha === null) {
+        // Could be 404 (no data.json yet) or network error — try pushing current data
+        // For 404, our push will create the file
+        try {
+          const testResp = await fetch(REPO_API, {
+            headers: { Authorization: `Bearer ${getToken()}`, Accept: 'application/vnd.github.v3+json' },
+            cache: 'no-store'
+          });
+          if (testResp.status !== 404 && !testResp.ok) {
+            settingsError.textContent = 'Token 无效或无权限访问此仓库';
+            setToken(''); // clear invalid token
+            syncEnabled = false;
+            updateSyncUI('off');
+            return;
+          }
+          // 404 is fine — means no data.json yet, will create on first save
+          remoteSha = null;
+        } catch (e) {
+          // Network error, but token format looks ok — proceed
+        }
+      }
+
+      if (remoteData) {
+        foods.daily = remoteData.daily;
+        foods.premium = remoteData.premium;
+        saveFoods(STORAGE_KEY_DAILY, foods.daily);
+        saveFoods(STORAGE_KEY_PREMIUM, foods.premium);
+        renderList('daily');
+        renderList('premium');
+        showToast('已从云端同步数据 ✅');
+      } else {
+        // Push local data to remote (first sync)
+        await pushRemoteData();
+        showToast('同步已启用 ✅');
+      }
+
+      updateSyncUI('on');
+      btnClearToken.style.display = '';
+      settingsError.textContent = '';
+      closeSettings();
+    }
+
+    function clearSyncSettings() {
+      clearToken();
+      syncEnabled = false;
+      remoteSha = null;
+      settingsTokenInput.value = '';
+      btnClearToken.style.display = 'none';
+      updateSyncUI('off');
+      showToast('已清除 Token，同步已关闭');
+    }
+
+    btnSettings.addEventListener('click', openSettings);
+    btnSettingsCancel.addEventListener('click', closeSettings);
+    btnSettingsSave.addEventListener('click', saveSettings);
+    btnClearToken.addEventListener('click', clearSyncSettings);
+
+    settingsOverlay.addEventListener('click', (e) => {
+      if (e.target === settingsOverlay) closeSettings();
+    });
+
+    settingsTokenInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') saveSettings();
+      if (e.key === 'Escape') closeSettings();
     });
   </script>
 </body>
