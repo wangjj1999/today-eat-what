@@ -40,6 +40,16 @@ body {
   margin: 0 auto;
 }
 
+/* ===== Section Header (per menu panel) ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.section-header .section-icon { font-size: 22px; }
+.section-header .section-title { font-size: 17px; font-weight: 800; }
+
 /* ===== Lottery Section ===== */
 .lottery-section {
   display: flex;
@@ -70,6 +80,20 @@ body {
 }
 .lottery-box.result {
   border-style: solid;
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+/* Premium (改善伙食) lottery box overrides */
+.lottery-box.premium {
+  border-color: #a78bfa;
+  background: #f5f3ff;
+}
+.lottery-box.premium.rolling {
+  border-color: #8b5cf6;
+  background: #ede9fe;
+}
+.lottery-box.premium.result {
   border-color: #10b981;
   background: #ecfdf5;
 }
@@ -115,6 +139,23 @@ body {
 .btn-lottery:active:not(:disabled) { transform: translateY(0); }
 .btn-lottery:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ===== Menu Panel ===== */
+.menu-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-lottery.premium {
+  background: linear-gradient(135deg, #f59e0b, #8b5cf6);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+.btn-lottery.premium:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
 /* ===== Food List Section ===== */
 .list-section { flex: 1; }
 
@@ -139,6 +180,9 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .btn-add:hover { background: #059669; }
+
+.btn-add.premium { background: #8b5cf6; }
+.btn-add.premium:hover { background: #7c3aed; }
 
 .food-list {
   list-style: none;
@@ -312,13 +356,11 @@ body {
     gap: 32px;
     padding: 32px 24px;
   }
-  .lottery-section { flex: 1; position: sticky; top: 20px; }
-  .list-section { flex: 1; }
   .header { padding: 24px 16px 20px; }
   .header-title { font-size: 26px; }
-  .lottery-box { padding: 40px 24px; min-height: 140px; }
-  .lottery-result { font-size: 34px; line-height: 48px; }
-  .food-list { max-height: 460px; }
+  .lottery-box { padding: 32px 20px; min-height: 120px; }
+  .lottery-result { font-size: 28px; line-height: 40px; }
+  .food-list { max-height: 300px; }
 }
   </style>
 </head>
@@ -330,24 +372,51 @@ body {
   </header>
 
   <main class="main">
-    <!-- Lottery Section -->
-    <section class="lottery-section">
-      <div class="lottery-box" id="lotteryBox">
-        <span class="lottery-label">🎰 点击下方按钮开始抽奖</span>
-        <span class="lottery-result" id="lotteryResult"></span>
+    <!-- 日常餐谱 -->
+    <div class="menu-panel" data-menu="daily">
+      <div class="section-header">
+        <span class="section-icon">🍚</span>
+        <span class="section-title">日常</span>
       </div>
-      <button class="btn-lottery" id="btnLottery" disabled>🎲 开抽！</button>
-    </section>
+      <section class="lottery-section">
+        <div class="lottery-box" id="lotteryBoxDaily">
+          <span class="lottery-label">🎰 点击下方按钮开始抽奖</span>
+          <span class="lottery-result" id="lotteryResultDaily"></span>
+        </div>
+        <button class="btn-lottery" id="btnLotteryDaily" disabled>🎲 开抽！</button>
+      </section>
+      <section class="list-section">
+        <div class="list-header">
+          <span class="list-title">📋 可吃清单 (<span id="countDisplayDaily">0</span>)</span>
+          <button class="btn-add" id="btnAddDaily">+ 添加</button>
+        </div>
+        <ul class="food-list" id="foodListDaily"></ul>
+        <p class="empty-hint" id="emptyHintDaily">还没有添加吃的，先加点吧~</p>
+      </section>
+    </div>
 
-    <!-- Food List Section -->
-    <section class="list-section">
-      <div class="list-header">
-        <span class="list-title">📋 可吃清单 (<span id="countDisplay">0</span>)</span>
-        <button class="btn-add" id="btnAdd">+ 添加</button>
+    <!-- 改善伙食餐谱 -->
+    <div class="menu-panel" data-menu="premium">
+      <div class="section-header">
+        <span class="section-icon">🥘</span>
+        <span class="section-title">改善伙食</span>
       </div>
-      <ul class="food-list" id="foodList"></ul>
-      <p class="empty-hint" id="emptyHint">还没有添加吃的，先加点吧~</p>
-    </section>
+      <section class="lottery-section">
+        <div class="lottery-box premium" id="lotteryBoxPremium">
+          <span class="lottery-label">🎰 点击下方按钮开始抽奖</span>
+          <span class="lottery-result" id="lotteryResultPremium"></span>
+        </div>
+        <button class="btn-lottery premium" id="btnLotteryPremium" disabled>🎲 开抽！</button>
+      </section>
+      <section class="list-section">
+        <div class="list-header">
+          <span class="list-title">📋 可吃清单 (<span id="countDisplayPremium">0</span>)</span>
+          <button class="btn-add premium" id="btnAddPremium">+ 添加</button>
+        </div>
+        <ul class="food-list" id="foodListPremium"></ul>
+        <p class="empty-hint" id="emptyHintPremium">还没有添加吃的，先加点吧~</p>
+      </section>
+    </div>
   </main>
 
   <!-- Modal Overlay -->
@@ -388,43 +457,93 @@ body {
 
   <script>
     // ===== Data Layer =====
-    const STORAGE_KEY = 'food-list';
+    const STORAGE_KEY_DAILY = 'food-list-daily';
+    const STORAGE_KEY_PREMIUM = 'food-list-premium';
+    const LEGACY_KEY = 'food-list';
 
-    function loadFoods() {
+    function loadFoods(key, defaults) {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(key);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) return parsed.filter(f => typeof f === 'string' && f.trim());
         }
       } catch (e) { /* localStorage corrupt or unavailable */ }
-      return [];
+      return [...defaults];
     }
 
-    function saveFoods(foods) {
+    function saveFoods(key, foods) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(foods));
+        localStorage.setItem(key, JSON.stringify(foods));
       } catch (e) {
         showToast('存储空间不足，请清理一些数据');
       }
     }
 
-    // In-memory fallback
-    let foods = loadFoods();
+    // Migrate legacy data on first load
+    (function migrateLegacy() {
+      try {
+        const legacy = localStorage.getItem(LEGACY_KEY);
+        if (legacy) {
+          const parsed = JSON.parse(legacy);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Only migrate if daily key doesn't exist yet
+            if (!localStorage.getItem(STORAGE_KEY_DAILY)) {
+              localStorage.setItem(STORAGE_KEY_DAILY, JSON.stringify(parsed));
+            }
+          }
+          localStorage.removeItem(LEGACY_KEY);
+        }
+      } catch (e) { /* ignore */ }
+    })();
 
-    // Seed some defaults only on first visit
-    if (foods.length === 0) {
-      foods = ['兰州拉面', '黄焖鸡米饭', '沙县小吃', '麦当劳', '麻辣烫'];
-      saveFoods(foods);
+    // In-memory state
+    const DEFAULT_DAILY = ['兰州拉面', '黄焖鸡米饭', '沙县小吃', '麦当劳', '麻辣烫'];
+    const DEFAULT_PREMIUM = [];
+
+    let foods = {
+      daily: loadFoods(STORAGE_KEY_DAILY, DEFAULT_DAILY),
+      premium: loadFoods(STORAGE_KEY_PREMIUM, DEFAULT_PREMIUM),
+    };
+
+    function persistMenu(menuKey) {
+      const key = menuKey === 'daily' ? STORAGE_KEY_DAILY : STORAGE_KEY_PREMIUM;
+      saveFoods(key, foods[menuKey]);
     }
     // ===== DOM References =====
-    const lotteryBox  = document.getElementById('lotteryBox');
-    const lotteryResult = document.getElementById('lotteryResult');
-    const btnLottery  = document.getElementById('btnLottery');
-    const foodList    = document.getElementById('foodList');
-    const countDisplay = document.getElementById('countDisplay');
-    const emptyHint   = document.getElementById('emptyHint');
-    const btnAdd      = document.getElementById('btnAdd');
+    // Daily
+    const lotteryBoxDaily    = document.getElementById('lotteryBoxDaily');
+    const lotteryResultDaily = document.getElementById('lotteryResultDaily');
+    const btnLotteryDaily    = document.getElementById('btnLotteryDaily');
+    const foodListDaily      = document.getElementById('foodListDaily');
+    const countDisplayDaily  = document.getElementById('countDisplayDaily');
+    const emptyHintDaily     = document.getElementById('emptyHintDaily');
+    const btnAddDaily        = document.getElementById('btnAddDaily');
+
+    // Premium
+    const lotteryBoxPremium    = document.getElementById('lotteryBoxPremium');
+    const lotteryResultPremium = document.getElementById('lotteryResultPremium');
+    const btnLotteryPremium    = document.getElementById('btnLotteryPremium');
+    const foodListPremium      = document.getElementById('foodListPremium');
+    const countDisplayPremium  = document.getElementById('countDisplayPremium');
+    const emptyHintPremium     = document.getElementById('emptyHintPremium');
+    const btnAddPremium        = document.getElementById('btnAddPremium');
+
+    // DOM ref lookup helpers
+    const domRefs = {
+      daily: {
+        lotteryBox: lotteryBoxDaily, lotteryResult: lotteryResultDaily,
+        btnLottery: btnLotteryDaily, foodList: foodListDaily,
+        countDisplay: countDisplayDaily, emptyHint: emptyHintDaily,
+        btnAdd: btnAddDaily,
+      },
+      premium: {
+        lotteryBox: lotteryBoxPremium, lotteryResult: lotteryResultPremium,
+        btnLottery: btnLotteryPremium, foodList: foodListPremium,
+        countDisplay: countDisplayPremium, emptyHint: emptyHintPremium,
+        btnAdd: btnAddPremium,
+      },
+    };
 
     // Modal — add/edit
     const modalOverlay = document.getElementById('modalOverlay');
@@ -444,40 +563,44 @@ body {
     const toast = document.getElementById('toast');
 
     // ===== State =====
-    let editIndex = -1;       // -1 = adding, >= 0 = editing
+    let editIndex = -1;
     let deleteIndex = -1;
-    let isRolling = false;
+    let currentMenu = 'daily'; // which menu the modal is operating on
+    let isRollingDaily = false;
+    let isRollingPremium = false;
 
     // ===== Render =====
-    function renderList() {
-      const count = foods.length;
-      countDisplay.textContent = count;
+    function renderList(menuKey) {
+      const refs = domRefs[menuKey];
+      const list = foods[menuKey];
+      const count = list.length;
 
-      // Empty state
+      refs.countDisplay.textContent = count;
+
       if (count === 0) {
-        emptyHint.classList.remove('hidden');
-        foodList.innerHTML = '';
-        btnLottery.disabled = true;
-        btnLottery.textContent = '🎲 开抽！';
-        lotteryResult.textContent = '';
-        lotteryResult.classList.remove('bounce');
-        lotteryBox.classList.remove('result');
+        refs.emptyHint.classList.remove('hidden');
+        refs.foodList.innerHTML = '';
+        refs.btnLottery.disabled = true;
+        refs.btnLottery.textContent = '🎲 开抽！';
+        refs.lotteryResult.textContent = '';
+        refs.lotteryResult.classList.remove('bounce');
+        refs.lotteryBox.classList.remove('result');
         return;
       }
 
-      emptyHint.classList.add('hidden');
-      btnLottery.disabled = false;
-      btnLottery.textContent = '🎲 开抽！';
-      lotteryResult.textContent = '';
-      lotteryResult.classList.remove('bounce');
-      lotteryBox.classList.remove('result');
+      refs.emptyHint.classList.add('hidden');
+      refs.btnLottery.disabled = false;
+      refs.btnLottery.textContent = '🎲 开抽！';
+      refs.lotteryResult.textContent = '';
+      refs.lotteryResult.classList.remove('bounce');
+      refs.lotteryBox.classList.remove('result');
 
-      foodList.innerHTML = foods.map((name, i) => `
+      refs.foodList.innerHTML = list.map((name, i) => `
         <li>
           <span class="food-name">${escapeHtml(name)}</span>
           <span class="food-actions">
-            <button class="btn-icon" data-edit="${i}" title="编辑">✏️</button>
-            <button class="btn-icon danger" data-delete="${i}" title="删除">🗑️</button>
+            <button class="btn-icon" data-menu="${menuKey}" data-edit="${i}" title="编辑">✏️</button>
+            <button class="btn-icon danger" data-menu="${menuKey}" data-delete="${i}" title="删除">🗑️</button>
           </span>
         </li>
       `).join('');
@@ -490,22 +613,27 @@ body {
     }
 
     // ===== Initial render =====
-    renderList();
+    renderList('daily');
+    renderList('premium');
 
     // ===== Modal: Add / Edit =====
-    function openAddModal() {
+    function openAddModal(menuKey) {
+      currentMenu = menuKey;
       editIndex = -1;
-      modalTitle.textContent = '添加食物';
+      const label = menuKey === 'daily' ? '日常' : '改善伙食';
+      modalTitle.textContent = `添加食物 — ${label}`;
       modalInput.value = '';
       modalError.textContent = '';
       modalOverlay.classList.add('active');
       setTimeout(() => modalInput.focus(), 150);
     }
 
-    function openEditModal(index) {
+    function openEditModal(menuKey, index) {
+      currentMenu = menuKey;
       editIndex = index;
-      modalTitle.textContent = '编辑食物';
-      modalInput.value = foods[index];
+      const label = menuKey === 'daily' ? '日常' : '改善伙食';
+      modalTitle.textContent = `编辑食物 — ${label}`;
+      modalInput.value = foods[menuKey][index];
       modalError.textContent = '';
       modalOverlay.classList.add('active');
       setTimeout(() => { modalInput.focus(); modalInput.select(); }, 150);
@@ -526,25 +654,24 @@ body {
       }
 
       if (editIndex === -1) {
-        // Add
-        foods.push(name);
+        foods[currentMenu].push(name);
         showToast(`已添加「${name}」`);
       } else {
-        // Edit
-        const oldName = foods[editIndex];
-        foods[editIndex] = name;
+        const oldName = foods[currentMenu][editIndex];
+        foods[currentMenu][editIndex] = name;
         showToast(`已更新「${oldName}」→「${name}」`);
       }
 
-      saveFoods(foods);
-      renderList();
+      persistMenu(currentMenu);
+      renderList(currentMenu);
       closeModal();
     }
 
     // ===== Delete =====
-    function openDeleteModal(index) {
+    function openDeleteModal(menuKey, index) {
+      currentMenu = menuKey;
       deleteIndex = index;
-      deleteMsg.textContent = `确定删除「${foods[index]}」？`;
+      deleteMsg.textContent = `确定删除「${foods[menuKey][index]}」？`;
       deleteOverlay.classList.add('active');
     }
 
@@ -555,28 +682,28 @@ body {
 
     function confirmDelete() {
       if (deleteIndex === -1) return;
-      const name = foods[deleteIndex];
-      foods.splice(deleteIndex, 1);
-      saveFoods(foods);
-      renderList();
+      const name = foods[currentMenu][deleteIndex];
+      foods[currentMenu].splice(deleteIndex, 1);
+      persistMenu(currentMenu);
+      renderList(currentMenu);
       closeDeleteModal();
       showToast(`已删除「${name}」`);
 
       // Reset lottery display after deletion
-      resetLottery();
+      resetLottery(currentMenu);
     }
 
     // ===== Modal Event Listeners =====
-    btnAdd.addEventListener('click', openAddModal);
+    btnAddDaily.addEventListener('click', () => openAddModal('daily'));
+    btnAddPremium.addEventListener('click', () => openAddModal('premium'));
+
     btnCancel.addEventListener('click', closeModal);
     btnConfirm.addEventListener('click', confirmModal);
 
-    // Close modal on overlay click
     modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) closeModal();
     });
 
-    // Enter key to confirm, Escape to cancel
     modalInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') confirmModal();
       if (e.key === 'Escape') closeModal();
@@ -589,98 +716,107 @@ body {
       if (e.target === deleteOverlay) closeDeleteModal();
     });
 
-    // List item click delegation for edit/delete icons
-    foodList.addEventListener('click', (e) => {
+    // List item click delegation for edit/delete icons — both panels
+    foodListDaily.addEventListener('click', (e) => handleListClick('daily', e));
+    foodListPremium.addEventListener('click', (e) => handleListClick('premium', e));
+
+    function handleListClick(menuKey, e) {
       const editBtn = e.target.closest('[data-edit]');
       const deleteBtn = e.target.closest('[data-delete]');
 
       if (editBtn) {
         const index = parseInt(editBtn.dataset.edit, 10);
-        if (!isNaN(index) && index >= 0 && index < foods.length) {
-          openEditModal(index);
+        if (!isNaN(index) && index >= 0 && index < foods[menuKey].length) {
+          openEditModal(menuKey, index);
         }
       }
 
       if (deleteBtn) {
         const index = parseInt(deleteBtn.dataset.delete, 10);
-        if (!isNaN(index) && index >= 0 && index < foods.length) {
-          openDeleteModal(index);
+        if (!isNaN(index) && index >= 0 && index < foods[menuKey].length) {
+          openDeleteModal(menuKey, index);
         }
       }
-    });
-
-    // ===== Lottery =====
-    function resetLottery() {
-      lotteryResult.textContent = '';
-      lotteryResult.classList.remove('bounce');
-      lotteryBox.classList.remove('result');
-      btnLottery.textContent = '🎲 开抽！';
-      if (foods.length > 0) btnLottery.disabled = false;
     }
 
-    function startLottery() {
-      const count = foods.length;
-      if (count === 0 || isRolling) return;
-      isRolling = true;
-      btnLottery.disabled = true;
-      lotteryResult.classList.remove('bounce');
-      lotteryBox.classList.add('rolling');
-      lotteryBox.classList.remove('result');
+    // ===== Lottery =====
+    function resetLottery(menuKey) {
+      const refs = domRefs[menuKey];
+      refs.lotteryResult.textContent = '';
+      refs.lotteryResult.classList.remove('bounce');
+      refs.lotteryBox.classList.remove('result');
+      refs.btnLottery.textContent = '🎲 开抽！';
+      if (foods[menuKey].length > 0) refs.btnLottery.disabled = false;
+    }
 
-      // Pick the winner upfront
+    function isRolling(menuKey) {
+      return menuKey === 'daily' ? isRollingDaily : isRollingPremium;
+    }
+
+    function setRolling(menuKey, val) {
+      if (menuKey === 'daily') isRollingDaily = val;
+      else isRollingPremium = val;
+    }
+
+    function startLottery(menuKey) {
+      const refs = domRefs[menuKey];
+      const list = foods[menuKey];
+      const count = list.length;
+      if (count === 0 || isRolling(menuKey)) return;
+
+      setRolling(menuKey, true);
+      refs.btnLottery.disabled = true;
+      refs.lotteryResult.classList.remove('bounce');
+      refs.lotteryBox.classList.add('rolling');
+      refs.lotteryBox.classList.remove('result');
+
       const winnerIndex = Math.floor(Math.random() * count);
-      const winner = foods[winnerIndex];
+      const winner = list[winnerIndex];
 
-      // Build the rolling sequence
-      // Phase 1: fast roll ~1.5s at 80ms/step → ~19 steps
-      // Phase 2: slow down ~1.0s from 80ms → 300ms
       const fastSteps = 18;
       const slowSteps = 6;
       const sequence = [];
 
-      // Phase 1: random picks, fast
       for (let i = 0; i < fastSteps; i++) {
-        sequence.push({ name: foods[Math.floor(Math.random() * count)], delay: 80 });
+        sequence.push({ name: list[Math.floor(Math.random() * count)], delay: 80 });
       }
 
-      // Phase 2: gradually slowing down, end on winner
       for (let i = 0; i < slowSteps; i++) {
         const progress = i / slowSteps;
-        const delay = 80 + (300 - 80) * progress; // 80 → 300ms
-        const name = i === slowSteps - 1 ? winner : foods[Math.floor(Math.random() * count)];
+        const delay = 80 + (300 - 80) * progress;
+        const name = i === slowSteps - 1 ? winner : list[Math.floor(Math.random() * count)];
         sequence.push({ name, delay: Math.round(delay) });
       }
 
-      // Play the sequence
       let step = 0;
       function nextStep() {
         if (step >= sequence.length) {
-          // Animation complete — show result
-          finishLottery(winner);
+          finishLottery(menuKey, winner);
           return;
         }
-        lotteryResult.textContent = sequence[step].name;
+        refs.lotteryResult.textContent = sequence[step].name;
         step++;
         setTimeout(nextStep, sequence[step - 1].delay);
       }
       nextStep();
     }
 
-    function finishLottery(winner) {
-      lotteryBox.classList.remove('rolling');
-      lotteryBox.classList.add('result');
-      lotteryResult.textContent = winner;
-      lotteryResult.classList.add('bounce');
-      btnLottery.textContent = '🔄 再来一次';
-      btnLottery.disabled = false;
-      isRolling = false;
-      spawnConfetti();
+    function finishLottery(menuKey, winner) {
+      const refs = domRefs[menuKey];
+      refs.lotteryBox.classList.remove('rolling');
+      refs.lotteryBox.classList.add('result');
+      refs.lotteryResult.textContent = winner;
+      refs.lotteryResult.classList.add('bounce');
+      refs.btnLottery.textContent = '🔄 再来一次';
+      refs.btnLottery.disabled = false;
+      setRolling(menuKey, false);
+      spawnConfetti(refs.lotteryBox);
     }
 
     // ===== Confetti =====
-    function spawnConfetti() {
+    function spawnConfetti(box) {
       const emojis = ['🎉', '✨', '🍜', '🍛', '🥟', '🍔', '🍕', '🥡'];
-      const boxRect = lotteryBox.getBoundingClientRect();
+      const boxRect = box.getBoundingClientRect();
 
       for (let i = 0; i < 8; i++) {
         const el = document.createElement('span');
@@ -691,23 +827,26 @@ body {
         el.style.animationDelay = (Math.random() * 0.3) + 's';
         el.style.fontSize = (20 + Math.random() * 16) + 'px';
         document.body.appendChild(el);
-        // Clean up after animation
         setTimeout(() => el.remove(), 1500);
       }
     }
 
-    btnLottery.addEventListener('click', () => {
-      if (foods.length === 0) return;
-      if (foods.length === 1) {
-        // Single item: skip animation
-        lotteryBox.classList.add('result');
-        lotteryResult.textContent = foods[0];
-        lotteryResult.classList.add('bounce');
-        btnLottery.textContent = '🔄 就这一个，别犹豫了！';
+    btnLotteryDaily.addEventListener('click', () => handleLotteryClick('daily'));
+    btnLotteryPremium.addEventListener('click', () => handleLotteryClick('premium'));
+
+    function handleLotteryClick(menuKey) {
+      const refs = domRefs[menuKey];
+      const list = foods[menuKey];
+      if (list.length === 0) return;
+      if (list.length === 1) {
+        refs.lotteryBox.classList.add('result');
+        refs.lotteryResult.textContent = list[0];
+        refs.lotteryResult.classList.add('bounce');
+        refs.btnLottery.textContent = '🔄 就这一个，别犹豫了！';
         return;
       }
-      startLottery();
-    });
+      startLottery(menuKey);
+    }
     // ===== Toast =====
     let toastTimer = null;
 
@@ -723,23 +862,13 @@ body {
 
     // ===== Keyboard Shortcut =====
     document.addEventListener('keydown', (e) => {
-      // Don't trigger shortcuts when typing in the modal
       if (modalOverlay.classList.contains('active')) return;
       if (deleteOverlay.classList.contains('active')) return;
 
-      // Space or Enter to trigger lottery
+      // Space or Enter triggers daily lottery (primary)
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        if (!isRolling && foods.length > 0) {
-          if (foods.length === 1) {
-            lotteryBox.classList.add('result');
-            lotteryResult.textContent = foods[0];
-            lotteryResult.classList.add('bounce');
-            btnLottery.textContent = '🔄 就这一个，别犹豫了！';
-          } else {
-            startLottery();
-          }
-        }
+        handleLotteryClick('daily');
       }
     });
   </script>
